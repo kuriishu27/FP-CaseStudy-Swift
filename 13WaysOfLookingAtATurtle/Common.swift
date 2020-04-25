@@ -38,20 +38,20 @@ typealias Degrees = Float
 typealias Angle = Float
 
 /// Enumeration of available pen states
-enum PenState {
+enum PenState: Equatable {
     case up
     case down
 }
 
 /// Enumeration of available pen colors
-enum PenColor: String {
+enum PenColor: String, Equatable {
     case black
     case red
     case blue
 }
 
 /// A structure to store the (x,y) coordinates
-struct Position {
+struct Position: Equatable {
     let x: Float
     let y: Float
 }
