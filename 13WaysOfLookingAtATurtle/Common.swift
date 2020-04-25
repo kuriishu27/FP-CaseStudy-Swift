@@ -8,6 +8,22 @@
 
 import Foundation
 
+precedencegroup PipeOperatorPrecedence {
+    associativity: left
+    higherThan: LogicalConjunctionPrecedence
+}
+
+infix operator |>: PipeOperatorPrecedence
+
+func |> <A, B> (x: A, f: (A) -> B) -> B {
+  return f(x)
+}
+
+// (f |> g)(x) = f(g(x))
+func |> <A, B, C> (f: @escaping (A) -> B, g: @escaping (B) -> C) -> (A) -> C {
+  return { g(f($0)) }
+}
+
 // ======================================
 // Common types and helper functions
 // ======================================
