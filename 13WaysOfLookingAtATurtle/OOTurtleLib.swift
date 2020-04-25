@@ -37,41 +37,41 @@ class Turtle {
     var currentColor: PenColor = .red
     var currentPenState: PenState = .up
 
-    func move(_ distance: Distance) {
-        log("Move \(distance)")
+    lazy var move: (Distance) -> Unit = { distance in
+        self.log("Move \(distance)")
         // calculate new position
         let newPosition = calcNewPosition(distance: distance,
-                                          angle: currentAngle,
-                                          currentPos: currentPosition)
+                                          angle: self.currentAngle,
+                                          currentPos: self.currentPosition)
         // draw line if needed
-        if currentPenState == .up {
-            dummyDrawLine(log, currentPosition, newPosition, currentColor)
+        if self.currentPenState == .up {
+            dummyDrawLine(self.log, self.currentPosition, newPosition, self.currentColor)
         }
         // update the state
-        currentPosition = newPosition
+        self.currentPosition = newPosition
     }
 
-    func turn(_ angle: Float) {
+    lazy var turn: (Angle) -> Unit = { angle in
         print("Turn \(angle)")
         // calculate new angle
-        let newAngle = (currentAngle + angle).truncatingRemainder(dividingBy: 360)
+        let newAngle = (self.currentAngle + angle).truncatingRemainder(dividingBy: 360)
         // update the state
-        currentAngle = newAngle
+        self.currentAngle = newAngle
     }
 
-    func penUp() {
+    lazy var penUp: () -> Unit = {
         print("Pen up")
-        currentPenState = .up
+        self.currentPenState = .up
     }
 
-    func penDown() {
+    lazy var penDown: () -> Unit = {
         print("Pen down")
-        currentPenState = .down
+        self.currentPenState = .down
     }
 
-    func setColor(_ color: PenColor) {
+    lazy var setColor: (PenColor) -> Unit = { color in
         print("SetColor \(color)")
-        currentColor = color
+        self.currentColor = color
     }
 
 }
