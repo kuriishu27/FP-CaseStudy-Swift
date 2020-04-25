@@ -87,8 +87,3 @@ class OOTurtleClient {
     }
 
 }
-
-//    OOTurtleClient().drawTriangle()
-//    OOTurtleClient().drawThreeLines()
-//    OOTurtleClient().drawPolygon(4)
-
