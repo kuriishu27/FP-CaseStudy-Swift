@@ -25,7 +25,7 @@ import Foundation
 
 enum FPTurtle {
 
-    struct TurtleState {
+    struct TurtleState: Equatable {
         let position: Position
         let angle: Degrees
         let color: PenColor
@@ -39,12 +39,12 @@ enum FPTurtle {
 
     // note that state is LAST param in all these functions
 
-    static func move(_ log: (String) -> ()) -> (Distance) -> (TurtleState) -> TurtleState {
+    static func move(_ log: @escaping (String) -> ()) -> (Distance) -> (TurtleState) -> TurtleState {
         // calculate new position
 
         return { distance in
             return { state in
-//                log("Move %0.1f \(distance)")
+                log("Move %0.1f \(distance)")
                 let newPosition = calcNewPosition(distance: distance, angle: state.angle, currentPos: state.position)
                 // draw line if needed
                 if state.penState == .down {
@@ -60,11 +60,11 @@ enum FPTurtle {
 
     }
 
-    static func turn(_ log: (String) -> ()) -> (Angle) -> (TurtleState) -> TurtleState {
+    static func turn(_ log: @escaping (String) -> ()) -> (Angle) -> (TurtleState) -> TurtleState {
         // calculate new angle
         return { angle in
             return { state in
-//                log("Turn %0.1f \(angle)")
+                log("Turn %0.1f \(angle)")
                 let newAngle = (state.angle + angle).truncatingRemainder(dividingBy: 360)
                 // update the state
                 return TurtleState(position: state.position, angle: newAngle, color: state.color, penState: state.penState)
@@ -83,7 +83,7 @@ enum FPTurtle {
     }
 
     static func penDown(_ log: (String) -> ()) -> (TurtleState) -> TurtleState {
-        log("Pen up")
+        log("Pen down")
         return { state in
             return TurtleState(position: state.position,
                                angle: state.angle,
@@ -92,10 +92,10 @@ enum FPTurtle {
         }
     }
 
-    static func setColor(_ log: (String) -> ()) -> (PenColor) -> (TurtleState) -> TurtleState {
+    static func setColor(_ log: @escaping (String) -> ()) -> (PenColor) -> (TurtleState) -> TurtleState {
         return { color in
             return { state in
-//                log("SetColor %A \(color)")
+                log("SetColor %A \(color)")
                 return TurtleState(position: state.position,
                                    angle: state.angle,
                                    color: color,
