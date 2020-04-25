@@ -36,7 +36,7 @@ final class FPTurtleClient {
 
     /// Function to log a message
     static let log: (String) -> () = { message in
-        print(String(format: "%s", message))
+        print(message)
     }
 
     // versions with log baked in (via partial application)
@@ -46,8 +46,7 @@ final class FPTurtleClient {
     static let penUp = FPTurtle.penUp(log)
     static let setColor = FPTurtle.setColor(log)
 
-    let drawTriangle =
-        FPTurtle.initialTurtleState
+    static let drawTriangle = FPTurtle.initialTurtleState
         |> move(100)
         |> turn(120)
         |> move(100)
@@ -56,46 +55,51 @@ final class FPTurtleClient {
         |> turn(120)
         // back home at (0,0) with angle 0
 
-    let drawThreeLines =
-        Turtle.initialTurtleState
-        // draw black line
+    static let drawThreeLines = FPTurtle.initialTurtleState // draw black line
         |> penDown
         |> setColor(.black)
-        |> move(100)
-        // move without drawing
-        |> penUp
-        |> turn(90)
-        |> move(100)
-        |> turn(90)
-        // draw red line
-        |> penDown
-        |> setColor(.red)
-        |> move(100)
-        // move without drawing
-        |> penUp
-        |> turn(90)
-        |> move(100)
-        |> turn(90)
-        // back home at (0,0) with angle 0
-        // draw diagonal blue line
-        |> penDown
-        |> setColor(.blue)
-        |> turn(45)
-        |> move(100)
+        |> move(100) // move without drawing
+//        |> penUp
+//        |> turn(90)
+//        |> move(100)
+//        |> turn(90) // draw red line
+//        |> penDown
+//        |> setColor(.red)
+//        |> move(100) // move without drawing
+//        |> penUp
+//        |> turn(90)
+//        |> move(100)
+//        |> turn(90) // back home at (0,0) with angle 0 and draw diagonal blue line
+//        |> penDown
+//        |> setColor(.blue)
+//        |> turn(45)
+//        |> move(100)
 
-//    let drawPolygon n =
-//        let angle = 180.0 - (360.0/float n)
-//        let angleDegrees = angle * 1.0<Degrees>
-//
-//        // define a function that draws one side
-//        let oneSide state sideNumber =
-//            state
-//            |> move 100.0
-//            |> turn angleDegrees
-//
-//        // repeat for all sides
-//        [1..n]
-//        |> List.fold oneSide Turtle.initialTurtleState
+    static let drawPolygon: (Float) -> () = { n in
+        let angle = 180.0 - (360.0 / n)
+        let angleDegrees = angle * 1
+
+        // define a function that draws one side
+        func oneSide(state: FPTurtle.TurtleState) -> FPTurtle.TurtleState {
+            return state
+            |> move(100)
+            |> turn(angleDegrees)
+        }
+
+        // repeat for all sides
+        [1, 2, 3, 4]
+            |> reduce(FPTurtle.initialTurtleState, oneSide)
+
+    }
+
+    private static func reduce(
+                _ initialResult: FPTurtle.TurtleState,
+                _ nextPartialResult: @escaping (FPTurtle.TurtleState) -> FPTurtle.TurtleState) -> ([Int]) -> FPTurtle.TurtleState {
+
+        return { times in
+            return nextPartialResult(initialResult)
+        }
+    }
 
 }
 
