@@ -56,6 +56,33 @@ enum ErrorMessage: Error {
 }
 
 final class TurtleApiLayer_FP {
+extension ErrorMessage: LocalizedError {
+    var localizedDescription: String {
+        switch self {
+        case .InvalidDistance(let message):
+            return "Invalid distance: \(message)"
+        case .InvalidAngle(let message):
+            return "Invalid angle: \(message)"
+        case .InvalidColor(let message):
+            return "Invalid color: \(message)"
+        case .InvalidCommand(let message):
+            return "Invalid command: \(message)"
+        }
+    }
+
+    var errorDescription: String? {
+        switch self {
+        case .InvalidDistance(let message):
+            return "Invalid distance: \(message)"
+        case .InvalidAngle(let message):
+            return "Invalid angle: \(message)"
+        case .InvalidColor(let message):
+            return "Invalid color: \(message)"
+        case .InvalidCommand(let message):
+            return "Invalid command: \(message)"
+        }
+    }
+}
 
     /// Function to log a message
     let log: (String) -> Void = { message in
