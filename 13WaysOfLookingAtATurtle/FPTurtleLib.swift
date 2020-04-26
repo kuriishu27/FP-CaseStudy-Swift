@@ -39,7 +39,7 @@ enum FPTurtle {
 
     // note that state is LAST param in all these functions
 
-    static func move(_ log: @escaping (String) -> ()) -> (Distance) -> (TurtleState) -> TurtleState {
+    static func move(_ log: @escaping (String) -> Void) -> (Distance) -> (TurtleState) -> TurtleState {
         // calculate new position
 
         return { distance in
@@ -60,19 +60,22 @@ enum FPTurtle {
 
     }
 
-    static func turn(_ log: @escaping (String) -> ()) -> (Angle) -> (TurtleState) -> TurtleState {
+    static func turn(_ log: @escaping (String) -> Void) -> (Angle) -> (TurtleState) -> TurtleState {
         // calculate new angle
         return { angle in
             return { state in
                 log("Turn %0.1f \(angle)")
                 let newAngle = (state.angle + angle).truncatingRemainder(dividingBy: 360)
                 // update the state
-                return TurtleState(position: state.position, angle: newAngle, color: state.color, penState: state.penState)
+                return TurtleState(position: state.position,
+                                   angle: newAngle,
+                                   color: state.color,
+                                   penState: state.penState)
             }
         }
     }
 
-    static func penUp(_ log: (String) -> ()) -> (TurtleState) -> TurtleState {
+    static func penUp(_ log: (String) -> Void) -> (TurtleState) -> TurtleState {
         log("Pen up")
         return { state in
             return TurtleState(position: state.position,
@@ -82,7 +85,7 @@ enum FPTurtle {
         }
     }
 
-    static func penDown(_ log: (String) -> ()) -> (TurtleState) -> TurtleState {
+    static func penDown(_ log: (String) -> Void) -> (TurtleState) -> TurtleState {
         log("Pen down")
         return { state in
             return TurtleState(position: state.position,
@@ -92,7 +95,7 @@ enum FPTurtle {
         }
     }
 
-    static func setColor(_ log: @escaping (String) -> ()) -> (PenColor) -> (TurtleState) -> TurtleState {
+    static func setColor(_ log: @escaping (String) -> Void) -> (PenColor) -> (TurtleState) -> TurtleState {
         return { color in
             return { state in
                 log("SetColor %A \(color)")
@@ -104,4 +107,3 @@ enum FPTurtle {
         }
     }
 }
-

@@ -9,7 +9,7 @@
 import XCTest
 @testable import _3WaysOfLookingAtATurtle
 
-class __DependencyInjection_Interface_1_Tests: XCTestCase {
+class DependencyInjectionInterface1Tests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,16 +21,16 @@ class __DependencyInjection_Interface_1_Tests: XCTestCase {
 
     func testExample() {
 
-        let iTurtle = TurtleImplementation_OO.normalSize()  // an ITurtle type
-        let api = TurtleApiLayer_OO.TurtleApi(iTurtle: iTurtle)
-        TurtleApiClient_OO.drawTriangle(api)
+        let iTurtle = TurtleImplementationOO.normalSize()  // an ITurtle type
+        let api = TurtleApiLayerOO.TurtleApi(iTurtle: iTurtle)
+        TurtleApiClientOO.drawTriangle(api)
 
     }
 
     func testExample2() {
-        let iTurtle = TurtleImplementation_OO.halfSize()
-        let api = TurtleApiLayer_OO.TurtleApi(iTurtle: iTurtle)
-        TurtleApiClient_OO.drawTriangle(api)
+        let iTurtle = TurtleImplementationOO.halfSize()
+        let api = TurtleApiLayerOO.TurtleApi(iTurtle: iTurtle)
+        TurtleApiClientOO.drawTriangle(api)
     }
 
     func testPerformanceExample() {

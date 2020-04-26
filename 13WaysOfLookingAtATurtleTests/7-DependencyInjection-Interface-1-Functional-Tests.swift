@@ -9,7 +9,7 @@
 import XCTest
 @testable import _3WaysOfLookingAtATurtle
 
-class __DependencyInjection_Interface_1_Functional_Tests: XCTestCase {
+class DIInterfaceFP1Tests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,8 +21,12 @@ class __DependencyInjection_Interface_1_Functional_Tests: XCTestCase {
 
     func testNormalSize() {
 
-        let apiFn = TurtleImplementation_PassInAllFunctions.normalSize()
-        TurtleApiClient_PassInAllFunctions.drawTriangle(apiFn)
+        let exp = XCTestExpectation()
+
+        let apiFn = TurtleImplementationPassInAllFunctions.normalSize()
+        TurtleApiClientPassInAllFunctions.drawTriangle(api: apiFn) {
+            exp.fulfill()
+        }
 
     }
 
@@ -30,10 +34,8 @@ class __DependencyInjection_Interface_1_Functional_Tests: XCTestCase {
 
         let exp = XCTestExpectation()
 
-        let apiFn = TurtleImplementation_PassInAllFunctions.halfSize()
-        TurtleApiClient_PassInAllFunctions.drawTriangle(apiFn)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+        let apiFn = TurtleImplementationPassInAllFunctions.halfSize()
+        TurtleApiClientPassInAllFunctions.drawTriangle(api: apiFn) {
             exp.fulfill()
         }
     }

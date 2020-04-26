@@ -25,30 +25,28 @@ import Foundation
 //
 //    ======================================
 
-
 // ======================================
 // Turtle Api Layer
 // ======================================
-
 
 /// Define the exception for API errors
 enum TurtleApiException: Error {
     case exception(_ message: String)
 }
 
-enum TurtleApiLayer {
+public final class TurtleApiLayer {
 
     /// Function to log a message
-    static let log: (String) -> () = { message in
+    static let log: (String) -> Void = { message in
         print(String(format: "%s", message))
     }
 
-    struct TurtleApi {
+    public struct TurtleApi {
 
         let turtle = Turtle(log)
 
         // convert the distance parameter to a float, or throw an exception
-        static func validateDistance(_ distanceStr: String) throws -> Distance {
+        private static func validateDistance(_ distanceStr: String) throws -> Distance {
 
             guard let number = Int(distanceStr) else {
                 let msg = "Invalid distance \(distanceStr)"
@@ -61,7 +59,7 @@ enum TurtleApiLayer {
         }
 
         // convert the angle parameter to a float<Degrees>, or throw an exception
-        static func validateAngle(_ angleStr: String) throws -> Degrees {
+        private static func validateAngle(_ angleStr: String) throws -> Degrees {
 
             guard let distance = Float(angleStr) else {
 
@@ -75,42 +73,56 @@ enum TurtleApiLayer {
         }
 
         // convert the color parameter to a PenColor, or throw an exception
-        static func validateColor(_ colorStr: String) throws -> PenColor {
+        private static func validateColor(_ colorStr: String) throws -> PenColor {
             switch colorStr {
-                case "Black": return .black
-                case "Blue": return .blue
-                case "Red": return .red
-                default: throw TurtleApiException.exception("Color \(colorStr) is not recognized")
+            case "Black": return .black
+            case "Blue": return .blue
+            case "Red": return .red
+            default: throw TurtleApiException.exception("Color \(colorStr) is not recognized")
             }
         }
 
         /// Execute the command string, or throw an exception
         /// (exec : commandStr:string -> unit)
-        func exec(_ commandStr: String) throws {
-            let tokens = commandStr.split(separator: " ").map({ String($0) })
+        public func exec(_ commandStr: String) throws {
 
-            try tokens
-                .filter({ $0 == "Move" })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+            let tokens = commandStr
+                .split(separator: " ")
+                .map({ String($0) })
+                .map(trimString)
 
-            try tokens.filter({ $0 == "Turn" })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+            if tokens.count == 2 {
 
-            try tokens.filter({ $0 == "Angle" })
-                .map(TurtleApi.validateAngle)
-                .forEach(turtle.move)
+                let command = tokens[0]
+                let commandValue = tokens[1]
 
-            tokens.filter({ $0 == "PenUp" })
-                .forEach({ _ in turtle.penUp() })
+                switch command {
+                case TurtleCommands.move.rawValue:
+                    let distance = try TurtleApi.validateDistance(commandValue)
 
-            tokens.filter({ $0 == "PenDown" })
-                .forEach({ _ in turtle.penDown() })
+                    turtle.move(distance)
 
-            try tokens.filter({ $0 == "SetColor" })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+                case TurtleCommands.turn.rawValue:
+                    let angle = try TurtleApi.validateAngle(commandValue)
+
+                    turtle.turn(angle)
+
+                case TurtleCommands.penUp.rawValue:
+                    turtle.penDown()
+
+                case TurtleCommands.penDown.rawValue:
+                    turtle.penUp()
+
+                case TurtleCommands.setColor.rawValue:
+                    let color = try TurtleApi.validateColor(commandValue)
+                    turtle.setColor(color)
+                default: break
+
+                }
+
+            } else {
+                throw ErrorMessage.InvalidCommand(commandStr)
+            }
 
         }
     }
@@ -175,7 +187,6 @@ final class TurtleApiClient {
 
     }
 
-
     static let drawPolygon: (Float) -> Void = { n in
 
         let angle = 180.0 - (360.0 / n)
@@ -204,4 +215,3 @@ final class TurtleApiClient {
     }
 
 }
-

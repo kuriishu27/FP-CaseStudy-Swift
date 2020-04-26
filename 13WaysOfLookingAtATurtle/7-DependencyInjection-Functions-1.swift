@@ -30,7 +30,6 @@ import Foundation
 // TurtleApi - all Turtle functions are passed in as parameters
 // ======================================
 
-final class TurtleApi_PassInAllFunctions {
 enum TurtleCommands: String {
     case move = "Move"
     case turn = "Turn"
@@ -38,6 +37,8 @@ enum TurtleCommands: String {
     case penDown = "PenDown"
     case setColor = "SetColor"
 }
+
+final class TurtleApiPassInAllFunctions {
 
     // No functions in constructor
     final class TurtleApi {
@@ -48,47 +49,35 @@ enum TurtleCommands: String {
         func updateState(newState: FPTurtle.TurtleState) {
             self.state = newState
         }
-        
+
         /// Execute the command string, and return a Result
         /// Exec : commandStr:string -> Result<unit,ErrorMessage>
         func exec(move: @escaping (Distance) -> (TurtleState) -> TurtleState,
                   turn: @escaping (Angle) -> (TurtleState) -> TurtleState,
                   penUp: @escaping (TurtleState) -> TurtleState,
                   penDown: @escaping (TurtleState) -> TurtleState,
-                  setColor: @escaping (PenColor) -> (TurtleState) -> TurtleState) throws
-            -> (String) throws -> Result<Unit, ErrorMessage> {
+                  setColor: @escaping (PenColor) -> (TurtleState) -> TurtleState)
 
-            return { commandStr in
+            throws -> (String) throws -> Result<Unit, ErrorMessage> {
 
-                let tokens = commandStr
-                    .split(separator: " ")
-                    .map({ [String($0)] })
-                    .flatMap({ $0 })
+                return { commandStr in
 
-                guard let command = tokens.first else {
-                    throw ErrorMessage.InvalidCommand(commandStr)
-                }
+                    let tokens = commandStr
+                        .split(separator: " ")
+                        .map({ [String($0)] })
+                        .flatMap({ $0 })
 
-                switch command {
+                    guard let command = tokens.first else {
+                        throw ErrorMessage.InvalidCommand(commandStr)
+                    }
 
-                    case "Move":
+                    switch command {
 
-                        let distance = try tokens
-                            .filter({ $0 == "Move" })
-                            .map(TurtleApiLayer_FP.validateDistance)
-                            .compactMap({ try! $0.get() })
-                            .first ?? 0
-
-                        let newState = move(distance)(self.state)
-                        self.updateState(newState: newState)
-
-                        return Result.success(())
-
-                    case "Turn":
+                    case TurtleCommands.move.rawValue:
 
                         let distance = try tokens
-                            .filter({ $0 == "Turn" })
-                            .map(TurtleApiLayer_FP.validateDistance)
+                            .filter({ $0 == TurtleCommands.move.rawValue })
+                            .map(TurtleApiLayerFP.validateDistance)
                             .compactMap({ try $0.get() })
                             .first ?? 0
 
@@ -97,35 +86,48 @@ enum TurtleCommands: String {
 
                         return Result.success(())
 
-                    case "PenUp":
+                    case TurtleCommands.turn.rawValue:
+
+                        let distance = try tokens
+                            .filter({ $0 == TurtleCommands.turn.rawValue })
+                            .map(TurtleApiLayerFP.validateAngle)
+                            .compactMap({ try $0.get() })
+                            .first ?? 0
+
+                        let newState = move(distance)(self.state)
+                        self.updateState(newState: newState)
+
+                        return Result.success(())
+
+                    case TurtleCommands.penUp.rawValue:
 
                         let newState = penUp(self.state)
                         self.updateState(newState: newState)
 
                         return Result.success(())
 
-                    case "PenDown":
+                    case TurtleCommands.penDown.rawValue:
 
                         let newState = penDown(self.state)
                         self.updateState(newState: newState)
 
-                    return Result.success(())
+                        return Result.success(())
 
-                    case "SetColor":
+                    case TurtleCommands.setColor.rawValue:
 
-                        let color = try tokens.filter({ $0 == "SetColor" })
-                            .map(TurtleApiLayer_FP.validateColor)
+                        let color = try tokens.filter({ $0 == TurtleCommands.setColor.rawValue })
+                            .map(TurtleApiLayerFP.validateColor)
                             .first!
 
                         let newState = setColor(color)(self.state)
                         self.updateState(newState: newState)
 
-                    return Result.success(())
+                        return Result.success(())
 
                     default: throw ErrorMessage.InvalidCommand(commandStr)
 
+                    }
                 }
-            }
 
         }
     }
@@ -135,9 +137,9 @@ enum TurtleCommands: String {
 // Turtle Implementations for "Pass in all functions" design
 // -----------------------------
 
-fileprivate typealias TurtleApi = TurtleApi_PassInAllFunctions.TurtleApi
+private typealias TurtleApi = TurtleApiPassInAllFunctions.TurtleApi
 
-struct TurtleImplementation_PassInAllFunctions {
+struct TurtleImplementationPassInAllFunctions {
 
     static let log: (String) -> Void = { message in
         print(message)
@@ -195,19 +197,22 @@ struct TurtleImplementation_PassInAllFunctions {
 // Turtle API Client for "Pass in all functions" design
 // -----------------------------
 
-struct TurtleApiClient_PassInAllFunctions {
+struct TurtleApiClientPassInAllFunctions {
 
     // the API type is just a function
-    typealias ApiFunction = (String) throws -> Result<Unit,ErrorMessage>
+    typealias ApiFunction = (String) throws -> Result<Unit, ErrorMessage>
 
-    static let drawTriangle: (ApiFunction) -> () = { api in
+    static func drawTriangle(api: ApiFunction, completion: () -> Void) {
+//        ResultModule.result.returnFrom(m: <#T##Result<T, Error>#>)
         do {
-            try api("Move 100")
-            try api("Turn 120")
-            try api("Move 100")
-            try api("Turn 120")
-            try api("Move 100")
-            try api("Turn 120")
+            try api("Move 100").get()
+            try api("Turn 120").get()
+            try api("Move 100").get()
+            try api("Turn 120").get()
+            try api("Move 100").get()
+            try api("Turn 120").get()
+
+            completion()
         } catch let error {
             print(error.localizedDescription)
         }
@@ -219,10 +224,7 @@ struct TurtleApiClient_PassInAllFunctions {
 // Turtle Api Tests for "Pass in all functions" design
 // -----------------------------
 
-
-
 //let mockApi s =
 //printfn "[MockAPI] %s" s
 //Ok ()
-//TurtleApiClient_PassInAllFunctions.drawTriangle(mockApi)
-
+//TurtleApiClientPassInAllFunctions.drawTriangle(mockApi)

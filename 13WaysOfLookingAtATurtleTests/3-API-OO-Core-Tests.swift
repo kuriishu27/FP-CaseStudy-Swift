@@ -9,7 +9,7 @@
 import XCTest
 @testable import _3WaysOfLookingAtATurtle
 
-class __API_OO_Core_Tests: XCTestCase {
+class APIOOCoreTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
