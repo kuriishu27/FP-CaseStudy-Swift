@@ -27,7 +27,6 @@ import Foundation
 // Dependency Injection (OO style)
 // ============================================================================
 
-
 // ----------------------------
 // Turtle Interface
 // ----------------------------
@@ -48,10 +47,10 @@ protocol ITurtle {
 // Turtle Api Layer (OO version)
 // ----------------------------
 
-final class TurtleApiLayer_OO {
+final class TurtleApiLayerOO {
 
     /// Function to log a message
-    static let log: (String) -> () = { message in
+    static let log: (String) -> Void = { message in
         print(String(format: "%s", message))
     }
 
@@ -93,10 +92,10 @@ final class TurtleApiLayer_OO {
         // convert the color parameter to a PenColor, or throw an exception
         static func validateColor(_ colorStr: String) throws -> PenColor {
             switch colorStr {
-                case "Black": return .black
-                case "Blue": return .blue
-                case "Red": return .red
-                default: throw TurtleApiException.exception("Color \(colorStr) is not recognized")
+            case "Black": return .black
+            case "Blue": return .blue
+            case "Red": return .red
+            default: throw TurtleApiException.exception("Color \(colorStr) is not recognized")
             }
         }
 
@@ -106,11 +105,11 @@ final class TurtleApiLayer_OO {
             let tokens = commandStr.split(separator: " ").map({ String($0) })
 
             try tokens
-                .filter({ $0 == "Move" })
+                .filter({ $0 == TurtleCommands.move.rawValue })
                 .map(TurtleApi.validateDistance)
                 .forEach(turtle.move)
 
-            try tokens.filter({ $0 == "Turn" })
+            try tokens.filter({ $0 == TurtleCommands.turn.rawValue })
                 .map(TurtleApi.validateDistance)
                 .forEach(turtle.move)
 
@@ -118,13 +117,13 @@ final class TurtleApiLayer_OO {
                 .map(TurtleApi.validateAngle)
                 .forEach(turtle.move)
 
-            tokens.filter({ $0 == "PenUp" })
+            tokens.filter({ $0 == TurtleCommands.penUp.rawValue })
                 .forEach({ _ in turtle.penUp() })
 
-            tokens.filter({ $0 == "PenDown" })
+            tokens.filter({ $0 == TurtleCommands.penDown.rawValue })
                 .forEach({ _ in turtle.penDown() })
 
-            try tokens.filter({ $0 == "SetColor" })
+            try tokens.filter({ $0 == TurtleCommands.setColor.rawValue })
                 .map(TurtleApi.validateDistance)
                 .forEach(turtle.move)
 
@@ -140,10 +139,10 @@ extension Turtle: ITurtle {
 
 }
 
-struct TurtleImplementation_OO {
+struct TurtleImplementationOO {
 
     static let log: (String) -> Void = { message in
-        return "message"
+        print(message)
     }
 
     static func normalSize() -> some ITurtle {
@@ -165,15 +164,13 @@ struct TurtleImplementation_OO {
     }
 }
 
-
 // ----------------------------
 // Turtle Api Client (OO version)
 // ----------------------------
 
+enum TurtleApiClientOO {
 
-enum TurtleApiClient_OO {
-
-    static let drawTriangle: (TurtleApiLayer_OO.TurtleApi) -> Void = { api in
+    static let drawTriangle: (TurtleApiLayerOO.TurtleApi) -> Void = { api in
         do {
             try api.exec("Move 100")
             try api.exec("Turn 120")
