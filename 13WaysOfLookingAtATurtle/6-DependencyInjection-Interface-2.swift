@@ -43,7 +43,6 @@ struct TurtleFunctions {
 }
 // Note that there are NO "units" in these functions, unlike the OO version.
 
-
 // ----------------------------
 // Turtle Api Layer
 // ----------------------------
@@ -55,7 +54,6 @@ enum ErrorMessage: Error {
     case InvalidCommand(_: String)
 }
 
-final class TurtleApiLayer_FP {
 extension ErrorMessage: LocalizedError {
     var localizedDescription: String {
         switch self {
@@ -84,6 +82,8 @@ extension ErrorMessage: LocalizedError {
     }
 }
 
+final class TurtleApiLayerFP {
+
     /// Function to log a message
     let log: (String) -> Void = { message in
         print(message)
@@ -101,7 +101,6 @@ extension ErrorMessage: LocalizedError {
         return Result.success(Float(number))
     }
 
-
     // convert the angle parameter to a float, or throw an exception
     static func validateAngle(_ angleStr: String) throws -> Result<Angle, ErrorMessage> {
 
@@ -115,10 +114,10 @@ extension ErrorMessage: LocalizedError {
     // convert the color parameter to a PenColor, or throw an exception
     static func validateColor(_ colorStr: String) throws -> PenColor {
         switch colorStr {
-            case "Black": return .black
-            case "Blue": return .blue
-            case "Red": return .red
-            default: throw ErrorMessage.InvalidColor(colorStr)
+        case "Black": return .black
+        case "Blue": return .blue
+        case "Red": return .red
+        default: throw ErrorMessage.InvalidColor(colorStr)
         }
     }
 
@@ -138,7 +137,7 @@ extension ErrorMessage: LocalizedError {
         }
 
         /// Execute the command string, and return a Result
-        /// Exec : commandStr:string -> Result<unit,ErrorMessage>
+        /// exec: (commandStr: String) -> (state: TurtleState) -> Result<Unit, ErrorMessage>
         func exec(_ commandStr: String, _ state: TurtleState) throws -> Result<Unit, ErrorMessage> {
 
             let tokens = commandStr
@@ -151,63 +150,60 @@ extension ErrorMessage: LocalizedError {
 
             switch command {
 
-                case "Move":
+            case TurtleCommands.move.rawValue:
 
-                    let distance = try tokens
-                        .filter({ $0 == "Move" })
-                        .map(TurtleApiLayer_FP.validateDistance)
-                        .compactMap({ try! $0.get() })
+                let distance = try tokens
+                    .filter({ $0 == TurtleCommands.move.rawValue })
+                    .map(TurtleApiLayerFP.validateDistance)
+                    .compactMap({ try $0.get() })
+                    .first ?? 0
 
-                    let newState = turtleFunctions.move(distance.first!)(state)
-                    updateState(newState: newState)
+                let newState = turtleFunctions.move(distance)(state)
+                updateState(newState: newState)
+
+            return Result.success(())
+
+            case TurtleCommands.turn.rawValue:
+
+                let angle = try tokens
+                    .filter({ $0 == TurtleCommands.turn.rawValue })
+                    .map(TurtleApiLayerFP.validateAngle)
+                    .compactMap({ try $0.get() })
+                    .first ?? 0
+
+                let newState = turtleFunctions.turn(angle)(state)
+                updateState(newState: newState)
+
+            return Result.success(())
+
+            case TurtleCommands.penUp.rawValue:
+
+                let newState = turtleFunctions.penUp(state)
+                updateState(newState: newState)
+
+            return Result.success(())
+
+            case TurtleCommands.penDown.rawValue:
+
+                let newState = turtleFunctions.penDown(state)
+                updateState(newState: newState)
+
+            return Result.success(())
+
+            case TurtleCommands.setColor.rawValue:
+
+                let color = try tokens.filter({ $0 == TurtleCommands.setColor.rawValue })
+                    .map(TurtleApiLayerFP.validateColor)
+                    .first!
+
+                let newState = turtleFunctions.setColor(color)(state)
+                updateState(newState: newState)
 
                 return Result.success(())
 
-
-                case "Turn":
-
-                    let distance = try tokens
-                        .filter({ $0 == "Move" })
-                        .map(TurtleApiLayer_FP.validateDistance)
-                        .compactMap({ try! $0.get() })
-
-                    let newState = turtleFunctions.move(distance.first!)(state)
-                    updateState(newState: newState)
-
-                return Result.success(())
-
-
-                case "PenUp":
-
-                    let newState = turtleFunctions.penUp(state)
-                    updateState(newState: newState)
-
-                return Result.success(())
-
-
-                case "PenDown":
-
-                    let newState = turtleFunctions.penDown(state)
-                    updateState(newState: newState)
-
-                return Result.success(())
-
-
-                case "SetColor":
-
-                    let color = try tokens.filter({ $0 == "SetColor" })
-                        .map(TurtleApiLayer_FP.validateColor)
-                        .first!
-
-                    let newState = turtleFunctions.setColor(color)(state)
-                    updateState(newState: newState)
-
-                    return Result.success(())
-
-                default: throw ErrorMessage.InvalidCommand(commandStr)
+            default: throw ErrorMessage.InvalidCommand(commandStr)
 
             }
-
 
         }
     }
@@ -218,12 +214,12 @@ extension ErrorMessage: LocalizedError {
 // Multiple Turtle Implementations
 // ----------------------------
 
-final class TurtleImplementation_FP {
+final class TurtleImplementationFP {
 
-    static let normalSize: () -> TurtleFunctions = {
+    let normalSize: () -> TurtleFunctions = {
 
         let log: (String) -> Void = { message in
-            return message
+            print(message)
         }
 
         return TurtleFunctions(move: FPTurtle.move(log),
@@ -246,9 +242,9 @@ final class TurtleImplementation_FP {
 // Turtle Api Client
 // ----------------------------
 
-struct TurtleApiClient_FP {
+struct TurtleApiClientFP {
 
-    let drawTriangle: (TurtleApiLayer_FP.TurtleApi) -> Void = { api in
+    let drawTriangle: (TurtleApiLayerFP.TurtleApi) -> Void = { api in
 //        do {
 //            try api.exec("Move 100")
 //            try api.exec("Turn 120")
@@ -270,8 +266,8 @@ struct TurtleApiClient_FP {
 
 //
 //do
-//let turtleFns = TurtleImplementation_FP.halfSize()
-//let api = TurtleApiLayer_FP.TurtleApi(turtleFns)
-//TurtleApiClient_FP.drawTriangle(api)
+//let turtleFns = TurtleImplementationFP.halfSize()
+//let api = TurtleApiLayerFP.TurtleApi(turtleFns)
+//TurtleApiClientFP.drawTriangle(api)
 //
 //
