@@ -31,6 +31,13 @@ import Foundation
 // ======================================
 
 final class TurtleApi_PassInAllFunctions {
+enum TurtleCommands: String {
+    case move = "Move"
+    case turn = "Turn"
+    case penUp = "PenUp"
+    case penDown = "PenDown"
+    case setColor = "SetColor"
+}
 
     // No functions in constructor
     final class TurtleApi {
