@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import Runes
+import RxSwift
+import RxCocoa
 
 precedencegroup PipeOperatorPrecedence {
     associativity: left
@@ -87,7 +90,7 @@ let initialPenState: PenState = .down
 /// Emulating a real implementation for drawing a line
 func dummyDrawLine
     (
-    _ log: (String) -> (),
+    _ log: (String) -> Void,
     _ oldPos: Position,
     _ newPos: Position,
     _ color: PenColor
@@ -98,70 +101,148 @@ func dummyDrawLine
 
 /// trim a string
 let trimString: (String) -> String = { string in
-    return string.replacingOccurrences(of: " " , with: "")
+    return string.replacingOccurrences(of: " ", with: "")
 }
 
 // ======================================
 // Result companion module
 // ======================================
 
+precedencegroup KleisliOperatorPrecedence {
+    associativity: left
+    higherThan: PipeOperatorPrecedence
+}
 
-//struct ResultModule<T> {
-//
-//    var returnR: (T) -> Result = { x in Result.success(x) }
-//
-//    // infix version of bind
+infix operator >=>: KleisliOperatorPrecedence
+
+struct ResultModule<T> {
+
+    static func returnR(_ x: T) -> Result<T, Error> { Result.success(x) }
+
 //    let ( >>= ) xR f =
 //        Result.bind f xR
-//
-//    // infix version of map
+
+    // infix version of map
 //    let ( <!> ) = Result.map
-//
+    // USE RUNES <^>
+
 //    let applyR fR xR =
 //        fR >>= (fun f ->
 //        xR >>= (fun x ->
 //            returnR (f x) ))
-//
-//    // infix version of apply
+
+    // infix version of apply
 //    let ( <*> ) = applyR
-//
-//    // lift a one-parameter function to result world (same as mapR)
-//    let lift1R f x = f <!> x
-//
-//    // lift a two-parameter function to result world
-//    let lift2R f x y = f <!> x <*> y
-//
-//    /// Computation Expression
-//    type ResultBuilder() =
-//        member this.Bind(m:Result<'a,'error>,f:'a -> Result<'b,'error>) =
-//            Result.bind f m
-//        member this.Return(x) :Result<'a,'error> =
-//            returnR x
-//        member this.ReturnFrom(m) :Result<'a,'error> =
-//            m
-//        member this.Zero() :Result<unit,'error> =
-//            this.Return ()
-//        member this.Combine(m1, f) =
-//            this.Bind(m1, f)
-//        member this.Delay(f) =
-//            f
-//        member this.Run(m) =
-//            m()
-//        member this.TryWith(m:Result<'a,'error>, h: exn -> Result<'a,'error>) =
-//            try this.ReturnFrom(m)
-//            with e -> h e
-//        member this.TryFinally(m:Result<'a,'error>, compensation) =
-//            try this.ReturnFrom(m)
-//            finally compensation()
-//        member this.Using(res:#IDisposable, body) : Result<'b,'error> =
-//            this.TryFinally(body res, (fun () -> match res with null -> () | disp -> disp.Dispose()))
-//        member this.While(cond, m) =
-//            if not (cond()) then
-//                this.Zero()
-//            else
-//                this.Bind(m(), fun _ -> this.While(cond, m))
+
+    // lift a one-parameter function to result world (same as mapR)
+    static func lift1R<T, U>(f: (T) -> U, x: Result<T, Error>) -> Result<U, Error> { f <^> x }
+
+    // lift a two-parameter function to result world
+    static func lift2R<T, U, V> (f: (T) -> (U) -> V,
+                          x: Result<T, Error>,
+                          y: Result<U, Error>) -> Result<V, Error> {
+        return f <^> x <*> y
+    }
+
+    /// Computation Expression
+    struct ResultBuilder {
+
+        func bind<T, U>(m: Result<T, Error>, f: (T) -> Result<U, Error>) -> Result<U, Error> {
+            f -<< m
+        }
+
+        func `return`<T>(x: T) -> Result<T, Error> {
+            Result.success(x)
+        }
+
+        func returnFrom<T>(m: Result<T, Error>) -> Result<T, Error> {
+            m
+        }
+
+        func zero() -> Result<Unit, Error> {
+            self.return(x: ())
+        }
+
+        func combine<T, U>(m1: Result<T, Error>,
+                           f: (T) -> Result<U, Error>) -> Result<U, Error> {
+            return bind(m: m1, f: f)
+        }
+
+        func delay<T, U>(f: @escaping (T) -> U) -> (T) -> U {
+            f
+        }
+
+        func run<T, U>(m: @escaping (T) -> U) -> (T) -> U {
+            m
+        }
+
+        func tryWith<T>(m: Result<T, Error>,
+                        h: () throws -> Result<T, Error>) -> Result<T, Error> {
+            return returnFrom(m: m)
+        }
+
+        func tryFinally<T>(m: Result<T, Error>,
+                           compensation: () -> Void) -> Result<T, Error> {
+            compensation()
+            return returnFrom(m: m)
+        }
+
+        func using<T, U>(res: T,
+                         body: (T) -> Result<U, Error>) -> Result<U, Error> {
+
+            let m = body(res)
+
+            return tryFinally(m: m) {
+
+            }
+
+        }
+
+        func `while`<T>(cond: (Unit) -> Bool,
+                        m: (Unit) -> Result<T, Error>) -> Result<Unit, Error> {
+
+            if !cond(()) {
+                return zero()
+            } else {
+
+                func f (value: T) -> Result<Unit, Error> {
+                    self.while(cond: cond, m: m)
+                }
+
+                return bind(m: m(()), f: f)
+            }
+        }
+
+        func `for`<T, U>(seq: [T], body: (T) -> Result<U, Error>) -> Result<Unit, Error> {
+
+            var iter = seq.makeIterator()
+
+            guard let next = iter.next() else {
+                fatalError()
+            }
+
+            return self.using(res: next) { val -> Result<Unit, Error> in
+
+                let m: (Unit) -> Result<U, Error> = { _ in
+                    body(val)
+                }
+
+                let cond: (Unit) -> Bool = { _ in
+                    iter.next() == nil ? false : true
+                }
+
+                return self.while(cond: cond, m: m)
+
+            }
+
+        }
+
 //        member this.For(sequence:seq<_>, body) =
 //            this.Using(sequence.GetEnumerator(),
 //                (fun enum -> this.While(enum.MoveNext, fun _ -> body enum.Current)))
-//
-//    let result = ResultBuilder()
+
+    }
+
+    let result = ResultBuilder()
+
+}
