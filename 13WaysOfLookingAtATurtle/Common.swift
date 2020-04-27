@@ -19,17 +19,25 @@ precedencegroup PipeOperatorPrecedence {
 infix operator |>: PipeOperatorPrecedence
 
 func |> <A, B> (x: A, f: (A) -> B) -> B {
-  return f(x)
+    return f(x)
 }
 
 // (f |> g)(x) = f(g(x))
 func |> <A, B, C> (f: @escaping (A) -> B, g: @escaping (B) -> C) -> (A) -> C {
-  return { g(f($0)) }
+    return { g(f($0)) }
 }
 
 // ======================================
 // Common types and helper functions
 // ======================================
+
+enum TurtleCommands: String {
+    case move = "Move"
+    case turn = "Turn"
+    case penUp = "PenUp"
+    case penDown = "PenDown"
+    case setColor = "SetColor"
+}
 
 /// An alias for a float
 typealias Distance = Float
@@ -94,9 +102,9 @@ func dummyDrawLine
     _ oldPos: Position,
     _ newPos: Position,
     _ color: PenColor
-    ) {
-        // for now just log it
-        log("...Draw line from (\(oldPos.x), \(oldPos.y)) to (\(newPos.x), \(newPos.y)) using \(color)")
+) {
+    // for now just log it
+    log("...Draw line from (\(oldPos.x), \(oldPos.y)) to (\(newPos.x), \(newPos.y)) using \(color)")
 }
 
 /// trim a string
@@ -119,28 +127,28 @@ struct ResultModule<T> {
 
     static func returnR(_ x: T) -> Result<T, Error> { Result.success(x) }
 
-//    let ( >>= ) xR f =
-//        Result.bind f xR
+    //    let ( >>= ) xR f =
+    //        Result.bind f xR
 
     // infix version of map
-//    let ( <!> ) = Result.map
+    //    let ( <!> ) = Result.map
     // USE RUNES <^>
 
-//    let applyR fR xR =
-//        fR >>= (fun f ->
-//        xR >>= (fun x ->
-//            returnR (f x) ))
+    //    let applyR fR xR =
+    //        fR >>= (fun f ->
+    //        xR >>= (fun x ->
+    //            returnR (f x) ))
 
     // infix version of apply
-//    let ( <*> ) = applyR
+    //    let ( <*> ) = applyR
 
     // lift a one-parameter function to result world (same as mapR)
     static func lift1R<T, U>(f: (T) -> U, x: Result<T, Error>) -> Result<U, Error> { f <^> x }
 
     // lift a two-parameter function to result world
     static func lift2R<T, U, V> (f: (T) -> (U) -> V,
-                          x: Result<T, Error>,
-                          y: Result<U, Error>) -> Result<V, Error> {
+                                 x: Result<T, Error>,
+                                 y: Result<U, Error>) -> Result<V, Error> {
         return f <^> x <*> y
     }
 
@@ -237,9 +245,9 @@ struct ResultModule<T> {
 
         }
 
-//        member this.For(sequence:seq<_>, body) =
-//            this.Using(sequence.GetEnumerator(),
-//                (fun enum -> this.While(enum.MoveNext, fun _ -> body enum.Current)))
+        //        member this.For(sequence:seq<_>, body) =
+        //            this.Using(sequence.GetEnumerator(),
+        //                (fun enum -> this.While(enum.MoveNext, fun _ -> body enum.Current)))
 
     }
 

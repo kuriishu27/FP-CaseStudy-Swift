@@ -1,5 +1,5 @@
 //
-//  6-DependencyInjection-Functions-1.swift
+//  7-DependencyInjection-Functions-1.swift
 //  13WaysOfLookingAtATurtle
 //
 //  Created by Christian Leovido on 24/04/2020.
@@ -30,23 +30,15 @@ import Foundation
 // TurtleApi - all Turtle functions are passed in as parameters
 // ======================================
 
-enum TurtleCommands: String {
-    case move = "Move"
-    case turn = "Turn"
-    case penUp = "PenUp"
-    case penDown = "PenDown"
-    case setColor = "SetColor"
-}
-
 final class TurtleApiPassInAllFunctions {
 
     // No functions in constructor
     final class TurtleApi {
 
-        var state = FPTurtle.initialTurtleState
+        private var state = FPTurtle.initialTurtleState
 
         /// Update the mutable state value
-        func updateState(newState: FPTurtle.TurtleState) {
+        private func updateState(newState: FPTurtle.TurtleState) {
             self.state = newState
         }
 
@@ -57,8 +49,7 @@ final class TurtleApiPassInAllFunctions {
                   penUp: @escaping (TurtleState) -> TurtleState,
                   penDown: @escaping (TurtleState) -> TurtleState,
                   setColor: @escaping (PenColor) -> (TurtleState) -> TurtleState)
-
-            throws -> (String) throws -> Result<Unit, ErrorMessage> {
+            -> (String) -> Result<Unit, ErrorMessage> {
 
                 return { commandStr in
 
@@ -67,64 +58,46 @@ final class TurtleApiPassInAllFunctions {
                         .map({ [String($0)] })
                         .flatMap({ $0 })
 
-                    guard let command = tokens.first else {
-                        throw ErrorMessage.InvalidCommand(commandStr)
-                    }
+                    let command = tokens.count > 0 ? tokens[0] : ""
+                    let commandValue = tokens.count == 1 ? "" : tokens[1]
 
                     switch command {
 
                     case TurtleCommands.move.rawValue:
 
-                        let distance = try tokens
-                            .filter({ $0 == TurtleCommands.move.rawValue })
-                            .map(TurtleApiLayerFP.validateDistance)
-                            .compactMap({ try $0.get() })
-                            .first ?? 0
-
+                        let distance = try! TurtleApiLayerFP.validateDistance(commandValue).get()
                         let newState = move(distance)(self.state)
-                        self.updateState(newState: newState)
 
-                        return Result.success(())
+                        return Result.success(self.updateState(newState: newState))
 
                     case TurtleCommands.turn.rawValue:
 
-                        let distance = try tokens
-                            .filter({ $0 == TurtleCommands.turn.rawValue })
-                            .map(TurtleApiLayerFP.validateAngle)
-                            .compactMap({ try $0.get() })
-                            .first ?? 0
+                        let angle = try! TurtleApiLayerFP.validateAngle(commandValue).get()
+                        let newState = turn(angle)(self.state)
 
-                        let newState = move(distance)(self.state)
-                        self.updateState(newState: newState)
-
-                        return Result.success(())
+                        return Result.success(self.updateState(newState: newState))
 
                     case TurtleCommands.penUp.rawValue:
 
                         let newState = penUp(self.state)
-                        self.updateState(newState: newState)
 
-                        return Result.success(())
+                        return Result.success(self.updateState(newState: newState))
 
                     case TurtleCommands.penDown.rawValue:
 
                         let newState = penDown(self.state)
-                        self.updateState(newState: newState)
 
-                        return Result.success(())
+                        return Result.success(self.updateState(newState: newState))
 
                     case TurtleCommands.setColor.rawValue:
 
-                        let color = try tokens.filter({ $0 == TurtleCommands.setColor.rawValue })
-                            .map(TurtleApiLayerFP.validateColor)
-                            .first!
-
+                        let color = try! TurtleApiLayerFP.validateColor(commandValue).get()
                         let newState = setColor(color)(self.state)
-                        self.updateState(newState: newState)
 
-                        return Result.success(())
+                        return Result.success(self.updateState(newState: newState))
 
-                    default: throw ErrorMessage.InvalidCommand(commandStr)
+                    default: return Result<Unit, ErrorMessage>
+                                        .failure(ErrorMessage.InvalidCommand(commandStr))
 
                     }
                 }
@@ -153,25 +126,20 @@ struct TurtleImplementationPassInAllFunctions {
 
     // the return value is a function:
     //     String -> Result<Unit,ErrorMessage>
-    static let normalSize: () -> (String) throws -> Result<Unit, ErrorMessage> = {
+    static let normalSize: () -> (String) -> Result<Unit, ErrorMessage> = {
 
         let api = TurtleApi()
         // partially apply the functions
-        do {
-            let result = try api.exec(move: move, turn: turn, penUp: penUp, penDown: penDown, setColor: setColor)
-            return result
-        } catch let error {
-            // handle error
-        }
-
-        return { str in
-            Result.failure(ErrorMessage.InvalidCommand("Unknown error"))
-        }
+        return api.exec(move: move,
+                 turn: turn,
+                 penUp: penUp,
+                 penDown: penDown,
+                 setColor: setColor)
 
     }
     // the return value is a function:
     //     String -> Result<Unit,ErrorMessage>
-    static let halfSize: () -> (String) throws -> Result<Unit, ErrorMessage> = {
+    static let halfSize: () -> (String) -> Result<Unit, ErrorMessage> = {
 
         let moveHalf: (Distance) -> ((TurtleState) -> TurtleState) = { distance in
             return move(distance / 2)
@@ -179,16 +147,11 @@ struct TurtleImplementationPassInAllFunctions {
 
         let api = TurtleApi()
         // partially apply the functions
-        do {
-            let result = try api.exec(move: moveHalf, turn: turn, penUp: penUp, penDown: penDown, setColor: setColor)
-            return result
-        } catch let error {
-            // handle error
-        }
-
-        return { str in
-            Result.failure(ErrorMessage.InvalidCommand("Unknown error"))
-        }
+        return api.exec(move: moveHalf,
+                     turn: turn,
+                     penUp: penUp,
+                     penDown: penDown,
+                     setColor: setColor)
     }
 
 }
@@ -202,17 +165,19 @@ struct TurtleApiClientPassInAllFunctions {
     // the API type is just a function
     typealias ApiFunction = (String) throws -> Result<Unit, ErrorMessage>
 
-    static func drawTriangle(api: ApiFunction, completion: () -> Void) {
-//        ResultModule.result.returnFrom(m: <#T##Result<T, Error>#>)
-        do {
-            try api("Move 100").get()
-            try api("Turn 120").get()
-            try api("Move 100").get()
-            try api("Turn 120").get()
-            try api("Move 100").get()
-            try api("Turn 120").get()
+    static func drawTriangle(api: ApiFunction) {
 
-            completion()
+        do {
+            try api("PenUp").get()
+            try api("SetColor Blue").get()
+            try api("Move 100").get()
+            try api("Turn 120").get()
+            try api("Move 100").get()
+            try api("Turn 120").get()
+            try api("Move 100").get()
+            try api("Turn 120").get()
+            try api("SetColor Red").get()
+            try api("PenDown").get()
         } catch let error {
             print(error.localizedDescription)
         }
