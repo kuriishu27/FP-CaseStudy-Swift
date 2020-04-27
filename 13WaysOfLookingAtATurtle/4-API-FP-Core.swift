@@ -34,7 +34,7 @@ final class FPTurtleApiLayer {
 
     /// Function to log a message
     static let log: (String) -> Void = { message in
-        print(String(format: "%s", message))
+        print(message)
     }
 
     // logged versions
@@ -46,10 +46,10 @@ final class FPTurtleApiLayer {
 
     final class FPTurtleApi {
 
-        var state = FPTurtle.initialTurtleState
+        private var state = FPTurtle.initialTurtleState
 
         /// Update the mutable state value
-        func updateState(newState: TurtleState) {
+        private func updateState(newState: TurtleState) {
             state = newState
         }
 
@@ -114,38 +114,31 @@ final class FPTurtleApiLayer {
         private func calculateNewStateR(_ tokens: [String],
                                         _ stateR: Result<TurtleState, Error>) -> Result<TurtleState, Error> {
 
-            if tokens.count == 2 {
+            let command = tokens.count > 0 ? tokens[0] : ""
+            let commandValue = tokens.count == 1 ? "" : tokens[1]
 
-                let command = tokens[0]
-                let commandValue = tokens[1]
+            switch command {
+            case TurtleCommands.move.rawValue:
 
-                switch command {
-                case TurtleCommands.move.rawValue:
+                let distanceR = validateDistance(commandValue)
+                return ResultModule<Distance>.lift2R(f: move, x: distanceR, y: stateR)
 
-                    let distanceR = validateDistance(commandValue)
-                    return ResultModule<Distance>.lift2R(f: move, x: distanceR, y: stateR)
+            case TurtleCommands.turn.rawValue:
 
-                case TurtleCommands.turn.rawValue:
+                let angleR = validateAngle(commandValue)
+                return ResultModule<Angle>.lift2R(f: turn, x: angleR, y: stateR)
 
-                    let angleR = validateAngle(commandValue)
-                    return ResultModule<Angle>.lift2R(f: turn, x: angleR, y: stateR)
+            case TurtleCommands.penUp.rawValue: return ResultModule.returnR(penUp(state))
+            case TurtleCommands.penDown.rawValue: return ResultModule.returnR(penDown(state))
 
-                case TurtleCommands.penUp.rawValue: return ResultModule.returnR(penUp(state))
-                case TurtleCommands.penDown.rawValue: return ResultModule.returnR(penDown(state))
+            case TurtleCommands.setColor.rawValue:
 
-                case TurtleCommands.setColor.rawValue:
+                let colorR = validateColor(commandValue)
+                return ResultModule<PenColor>.lift2R(f: setColor, x: colorR, y: stateR)
 
-                    let colorR = validateColor(commandValue)
-                    return ResultModule<PenColor>.lift2R(f: setColor, x: colorR, y: stateR)
-
-                default: break
-
-                }
+            default: return Result.failure(ErrorMessage.InvalidCommand("Invalid command"))
 
             }
-
-            return Result.failure(ErrorMessage.InvalidCommand("Invalid command"))
-
         }
 
     }
@@ -177,29 +170,29 @@ final class FPTurtleApiClient {
         let api = TurtleApi()
 
         // draw black line
-        _ = api.exec()("Pen Down")
+        _ = api.exec()("PenDown")
         _ = api.exec()("SetColor Black")
         _ = api.exec()("Move 100")
-        //            trymove without drawing
-        //            try api.Exec "Pen Up"
-        //            try api.Exec "Turn 90"
-        //            try api.Exec "Move 100"
-        //            try api.Exec "Turn 90"
-        //            trydraw red line
-        //            try api.Exec "Pen Down"
-        //            try api.Exec "SetColor Red"
-        //            try api.Exec "Move 100"
-        //            trymove without drawing
-        //            try api.Exec "Pen Up"
-        //            try api.Exec "Turn 90"
-        //            try api.Exec "Move 100"
-        //            try api.Exec "Turn 90"
-        //            tryback home at (0,0) with angle 0
-        //            trydraw diagonal blue line
-        //            try api.Exec "Pen Down"
-        //            try api.Exec "SetColor Blue"
-        //            try api.Exec "Turn 45"
-        //            try api.Exec "Move 100"
+//        trymove without drawing
+        _ = api.exec()("PenUp")
+        _ = api.exec()("Turn 90")
+        _ = api.exec()("Move 100")
+        _ = api.exec()("Turn 90")
+//        trydraw red line
+        _ = api.exec()("PenDown")
+        _ = api.exec()("SetColor Red")
+        _ = api.exec()("Move 100")
+//        trymove without drawing
+        _ = api.exec()("PenUp")
+        _ = api.exec()("Turn 90")
+        _ = api.exec()("Move 100")
+        _ = api.exec()("Turn 90")
+//        tryback home at (0,0) with angle 0
+//        trydraw diagonal blue line
+        _ = api.exec()("PenDown")
+        _ = api.exec()("SetColor Blue")
+        _ = api.exec()("Turn 45")
+        _ = api.exec()("Move 100")
     }
 
     let drawPolygon: (Float) -> Void = { n in
@@ -209,7 +202,7 @@ final class FPTurtleApiClient {
 
         // define a function that draws one side
         let drawOneSide: () -> Void = {
-            _ = api.exec()("Move 100.0")
+            _ = api.exec()("Move 100")
             _ = api.exec()("Turn \(angle)")
         }
 

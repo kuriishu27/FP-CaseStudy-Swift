@@ -91,37 +91,32 @@ public final class TurtleApiLayer {
                 .map({ String($0) })
                 .map(trimString)
 
-            if tokens.count == 2 {
+            let command = tokens.count > 0 ? tokens[0] : ""
+            let commandValue = tokens.count == 1 ? "" : tokens[1]
 
-                let command = tokens[0]
-                let commandValue = tokens[1]
+            switch command {
+            case TurtleCommands.move.rawValue:
+                let distance = try TurtleApi.validateDistance(commandValue)
 
-                switch command {
-                case TurtleCommands.move.rawValue:
-                    let distance = try TurtleApi.validateDistance(commandValue)
+                turtle.move(distance)
 
-                    turtle.move(distance)
+            case TurtleCommands.turn.rawValue:
+                let angle = try TurtleApi.validateAngle(commandValue)
 
-                case TurtleCommands.turn.rawValue:
-                    let angle = try TurtleApi.validateAngle(commandValue)
+                turtle.turn(angle)
 
-                    turtle.turn(angle)
+            case TurtleCommands.penUp.rawValue:
+                turtle.penDown()
 
-                case TurtleCommands.penUp.rawValue:
-                    turtle.penDown()
+            case TurtleCommands.penDown.rawValue:
+                turtle.penUp()
 
-                case TurtleCommands.penDown.rawValue:
-                    turtle.penUp()
+            case TurtleCommands.setColor.rawValue:
+                let color = try TurtleApi.validateColor(commandValue)
+                turtle.setColor(color)
 
-                case TurtleCommands.setColor.rawValue:
-                    let color = try TurtleApi.validateColor(commandValue)
-                    turtle.setColor(color)
-                default: break
+            default: break
 
-                }
-
-            } else {
-                throw ErrorMessage.InvalidCommand(commandStr)
             }
 
         }
@@ -195,8 +190,8 @@ final class TurtleApiClient {
         // define a function that draws one side
         let drawOneSide: () -> Void = {
             do {
-                try api.exec("Move 100.0")
-                try api.exec("Turn %f \(angle)")
+                try api.exec("Move 100")
+                try api.exec("Turn \(angle)")
             } catch let error {
                 TurtleApiClient.triggerError(error)
             }
