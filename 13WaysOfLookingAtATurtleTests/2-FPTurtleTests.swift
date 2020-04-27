@@ -11,20 +11,12 @@ import XCTest
 
 class FPTurtleTests: XCTestCase {
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
     func testDrawTriangle() {
-        FPTurtleClient.drawTriangle
+        _ = FPTurtleClient.drawTriangle
     }
 
     func testDrawThreeLines() {
-        FPTurtleClient.drawThreeLines
+        _ = FPTurtleClient.drawThreeLines
     }
 
     func testDrawPolygon() {

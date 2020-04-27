@@ -11,20 +11,19 @@ import XCTest
 
 class DependencyInjectionInterface2Tests: XCTestCase {
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() {
+    func testNormalSize() {
 
         let turtleFns = TurtleImplementationFP.normalSize()   // a TurtleFunctions type
         let api = TurtleApiLayerFP.TurtleApi(turtleFns)
-//        TurtleApiClientFP.drawTriangle(api)
+        TurtleApiClientFP().drawTriangle(api)
 
+    }
+
+    func testHalfSize() {
+
+        let turtleFns = TurtleImplementationFP.halfSize()
+        let api = TurtleApiLayerFP.TurtleApi(turtleFns)
+        TurtleApiClientFP().drawTriangle(api)
     }
 
 }
