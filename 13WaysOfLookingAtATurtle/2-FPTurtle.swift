@@ -25,10 +25,6 @@ import Foundation
 //    ======================================
 
 // ======================================
-// FP Turtle
-// ======================================
-
-// ======================================
 // FP Turtle Client
 // ======================================
 
@@ -87,7 +83,7 @@ final class FPTurtleClient {
         }
 
         // repeat for all sides
-        [1, 2, 3, 4]
+        _ = [1, 2, 3, 4]
             |> reduce(FPTurtle.initialTurtleState, oneSide)
 
     }
@@ -103,11 +99,3 @@ final class FPTurtleClient {
     }
 
 }
-
-// ======================================
-// FP Turtle tests
-// ======================================
-
-//FPTurtleClient.drawTriangle() |> ignore
-//FPTurtleClient.drawThreeLines() |> ignore
-//FPTurtleClient.drawPolygon 4 |> ignore
