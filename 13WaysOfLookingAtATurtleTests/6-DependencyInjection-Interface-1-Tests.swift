@@ -13,16 +13,16 @@ class DependencyInjectionInterface1Tests: XCTestCase {
 
     func testNormalSize() {
 
-        let iTurtle = TurtleImplementationOO.normalSize()  // an ITurtle type
+        let iTurtle = TurtleImplementationOO().normalSize()  // an ITurtle type
         let api = TurtleApiLayerOO.TurtleApi(iTurtle: iTurtle)
-        TurtleApiClientOO.drawTriangle(api)
+        TurtleApiClientOO().drawTriangle(api)
 
     }
 
     func testHalfSize() {
-        let iTurtle = TurtleImplementationOO.halfSize()
+        let iTurtle = TurtleImplementationOO().halfSize()
         let api = TurtleApiLayerOO.TurtleApi(iTurtle: iTurtle)
-        TurtleApiClientOO.drawTriangle(api)
+        TurtleApiClientOO().drawTriangle(api)
     }
 
 }

@@ -28,7 +28,7 @@ import Foundation
 // ============================================================================
 
 // ----------------------------
-// Turtle Interface
+// - MARK: Turtle Interface
 // ----------------------------
 
 typealias Unit = Void
@@ -44,7 +44,7 @@ protocol ITurtle {
     // "unit" in a function implies side effects
 
 // ----------------------------
-// Turtle Api Layer (OO version)
+// - MARK: Turtle Api Layer (OO version)
 // ----------------------------
 
 final class TurtleApiLayerOO {
@@ -54,9 +54,10 @@ final class TurtleApiLayerOO {
         print(String(format: "%s", message))
     }
 
-    struct TurtleApi {
+    // - MARK: Turtle Api
+    public struct TurtleApi {
 
-        let turtle: ITurtle
+        private let turtle: ITurtle
 
         init(iTurtle: ITurtle) {
             self.turtle = iTurtle
@@ -102,55 +103,75 @@ final class TurtleApiLayerOO {
         /// Execute the command string, or throw an exception
         /// (exec : commandStr:string -> unit)
         func exec(_ commandStr: String) throws {
-            let tokens = commandStr.split(separator: " ").map({ String($0) })
 
-            try tokens
-                .filter({ $0 == TurtleCommands.move.rawValue })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+            let tokens = commandStr
+                .split(separator: " ")
+                .map({ String($0) })
 
-            try tokens.filter({ $0 == TurtleCommands.turn.rawValue })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+            let command = tokens.count > 0 ? tokens[0] : ""
+            let commandValue = tokens.count == 1 ? "" : tokens[1]
 
-            try tokens.filter({ $0 == "Angle" })
-                .map(TurtleApi.validateAngle)
-                .forEach(turtle.move)
+            switch command {
 
-            tokens.filter({ $0 == TurtleCommands.penUp.rawValue })
-                .forEach({ _ in turtle.penUp() })
+            case TurtleCommands.move.rawValue:
 
-            tokens.filter({ $0 == TurtleCommands.penDown.rawValue })
-                .forEach({ _ in turtle.penDown() })
+                do {
+                    let distance = try TurtleApi.validateDistance(commandValue)
+                    turtle.move(distance)
+                } catch let error {
+                    throw error
+                }
 
-            try tokens.filter({ $0 == TurtleCommands.setColor.rawValue })
-                .map(TurtleApi.validateDistance)
-                .forEach(turtle.move)
+            case TurtleCommands.turn.rawValue:
+
+                do {
+                    let angle = try TurtleApi.validateAngle(commandValue)
+                    turtle.turn(angle)
+                } catch let error {
+                    throw error
+                }
+
+            case TurtleCommands.penUp.rawValue:
+                turtle.penUp()
+
+            case TurtleCommands.penDown.rawValue:
+                turtle.penDown()
+
+            case TurtleCommands.setColor.rawValue:
+
+                do {
+                    let color = try TurtleApi.validateColor(commandValue)
+                    turtle.setColor(color)
+                } catch let error {
+                    throw error
+                }
+
+            default: throw TurtleApiException.exception("Invalid command: \(command)")
+
+            }
 
         }
     }
 }
 
 // ----------------------------
-// Multiple Turtle Implementations (OO version)
+// - MARK: Multiple Turtle Implementations (OO version)
 // ----------------------------
 
-extension Turtle: ITurtle {
-
-}
+extension Turtle: ITurtle {}
 
 struct TurtleImplementationOO {
 
-    static let log: (String) -> Void = { message in
+    let log: (String) -> Void = { message in
         print(message)
     }
 
-    static func normalSize() -> some ITurtle {
+    func normalSize() -> some ITurtle {
         // return an interface wrapped around the Turtle
         return Turtle(log)
     }
 
-    static func halfSize() -> some ITurtle {
+    func halfSize() -> some ITurtle {
 
         return Turtle(log)
 
@@ -168,16 +189,19 @@ struct TurtleImplementationOO {
 // Turtle Api Client (OO version)
 // ----------------------------
 
-enum TurtleApiClientOO {
+final class TurtleApiClientOO {
 
-    static let drawTriangle: (TurtleApiLayerOO.TurtleApi) -> Void = { api in
+    let drawTriangle: (TurtleApiLayerOO.TurtleApi) -> Void = { api in
         do {
+            try api.exec("PenDown")
+            try api.exec("SetColor Blue")
             try api.exec("Move 100")
             try api.exec("Turn 120")
             try api.exec("Move 100")
             try api.exec("Turn 120")
             try api.exec("Move 100")
             try api.exec("Turn 120")
+            try api.exec("PenUp")
         } catch let error {
             // handle me
         }

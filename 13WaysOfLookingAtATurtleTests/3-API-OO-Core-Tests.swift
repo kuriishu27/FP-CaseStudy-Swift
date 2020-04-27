@@ -12,15 +12,18 @@ import XCTest
 class APIOOCoreTests: XCTestCase {
 
     func testDrawTriangle() {
-        TurtleApiClient.drawTriangle()
+        let client = TurtleApiClient()
+        client.drawTriangle()
     }
 
     func testDrawThreeLines() {
-        TurtleApiClient.drawThreeLines()
+        let client = TurtleApiClient()
+        client.drawThreeLines()
     }
 
     func testDrawPolygon() {
-        TurtleApiClient.drawPolygon(4)
+        let client = TurtleApiClient()
+        client.drawPolygon(4)
     }
 
 }

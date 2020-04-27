@@ -25,22 +25,26 @@ import Foundation
 //
 //    ======================================
 
-// ======================================
-// Turtle Api Layer
-// ======================================
 
 /// Define the exception for API errors
 enum TurtleApiException: Error {
     case exception(_ message: String)
 }
 
+// ======================================
+// - MARK: Turtle Api Layer
+// ======================================
+
 public final class TurtleApiLayer {
+
+
 
     /// Function to log a message
     static let log: (String) -> Void = { message in
-        print(String(format: "%s", message))
+        print(message)
     }
 
+    // - MARK: Turtle Api
     public struct TurtleApi {
 
         let turtle = Turtle(log)
@@ -124,12 +128,12 @@ public final class TurtleApiLayer {
 }
 
 // ======================================
-// Turtle Api Client
+// - MARK: Turtle Api Client
 // ======================================
 
 final class TurtleApiClient {
 
-    static let drawTriangle = {
+    let drawTriangle = {
 
         let api = TurtleApiLayer.TurtleApi()
 
@@ -147,7 +151,7 @@ final class TurtleApiClient {
 
     }
 
-    static let drawThreeLines = {
+    let drawThreeLines = {
 
         let api = TurtleApiLayer.TurtleApi()
 
@@ -182,7 +186,7 @@ final class TurtleApiClient {
 
     }
 
-    static let drawPolygon: (Float) -> Void = { n in
+    let drawPolygon: (Float) -> Void = { n in
 
         let angle = 180.0 - (360.0 / n)
         let api = TurtleApiLayer.TurtleApi()
@@ -205,7 +209,6 @@ final class TurtleApiClient {
     }
 
     static let triggerError: (Error) -> Void = { error in
-        // handle error to be displayed to the user
         print(error.localizedDescription)
     }
 
