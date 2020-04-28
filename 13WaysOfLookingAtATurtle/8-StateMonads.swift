@@ -198,8 +198,7 @@ final class TurtleComputationClient {
     private func bind<T>(_ f: @escaping (T) -> TurtleStateComputation<Unit>, _ value: T) -> TurtleStateComputation<Unit> {
 
         TurtleStateComputationClass
-        .bindT(f,
-               TurtleStateComputationClass.returnT(value))
+            .bindT(f, TurtleStateComputationClass.returnT(value))
 
     }
 
