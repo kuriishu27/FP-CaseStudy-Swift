@@ -79,7 +79,7 @@ func calcNewPosition(distance: Distance,
                      angle: Angle,
                      currentPos: Position) -> Position {
     // Convert degrees to radians with 180.0 degrees = 1 pi radian
-    let angleInRads = angle * Float((Double.pi / 180.0) * 1 / Double(angle))
+    let angleInRads = angle * Float((Double.pi / 180.0))
     // current pos
     let x0 = currentPos.x
     let y0 = currentPos.y
