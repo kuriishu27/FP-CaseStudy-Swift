@@ -23,6 +23,12 @@ import Foundation
 // Turtle module
 // ======================================
 
+extension TurtleState: CustomStringConvertible {
+    var description: String {
+        return "\n\nTURTLE STATE ---------\n\nPosition: \(position)\nAngle: \(angle)\ncolor: \(color)\nPenState: \(penState)\n\n"
+    }
+}
+
 enum FPTurtle {
 
     struct TurtleState: Equatable {
@@ -44,17 +50,24 @@ enum FPTurtle {
 
         return { distance in
             return { state in
-                log("Move %0.1f \(distance)")
-                let newPosition = calcNewPosition(distance: distance, angle: state.angle, currentPos: state.position)
+                log("Move \(distance)")
+                let newPosition = calcNewPosition(distance: distance,
+                                                  angle: state.angle,
+                                                  currentPos: state.position)
                 // draw line if needed
                 if state.penState == .down {
-//                    dummyDrawLine(log, state.position, newPosition, state.color)
+                    dummyDrawLine(log, state.position, newPosition, state.color)
                 }
                 // update the state
-                return TurtleState(position: newPosition,
-                                   angle: state.angle,
-                                   color: state.color,
-                                   penState: state.penState)
+
+                let newState = TurtleState(position: newPosition,
+                                           angle: state.angle,
+                                           color: state.color,
+                                           penState: state.penState)
+
+                print(newState)
+
+                return newState
             }
         }
 
@@ -64,7 +77,7 @@ enum FPTurtle {
         // calculate new angle
         return { angle in
             return { state in
-                log("Turn %0.1f \(angle)")
+                log("Turn \(angle)")
                 let newAngle = (state.angle + angle).truncatingRemainder(dividingBy: 360)
                 // update the state
                 return TurtleState(position: state.position,
