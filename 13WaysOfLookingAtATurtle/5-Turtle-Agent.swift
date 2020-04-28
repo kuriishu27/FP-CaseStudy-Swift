@@ -34,6 +34,10 @@ final class MailboxProcessor<T> {
     var state: TurtleState = FPTurtle.initialTurtleState
     var isRunning = false
 
+    init() {
+        self.isRunning = true
+    }
+
     func start(_ c: (MailboxProcessor) -> Void) {
         isRunning = true
     }
@@ -85,7 +89,7 @@ final class AgentImplementation {
 
         static let mailboxProc = MailboxProcessor<TurtleCommand>()
 
-        let process = mailboxProc.start { inbox in
+        let process: () = mailboxProc.start { inbox in
 
             while inbox.isRunning {
 
@@ -94,7 +98,6 @@ final class AgentImplementation {
 
                 // create a new state from handling the message
                 let nState = matchCommandState(command, state)
-
 
             }
         }
@@ -166,6 +169,8 @@ final class TurtleApiLayerAgent {
     func exec() -> (String) -> Result<Unit, Error> {
 
         return { commandStr in
+
+            self.turtleAgent.process
 
             let tokens = commandStr
                 .split(separator: " ")
