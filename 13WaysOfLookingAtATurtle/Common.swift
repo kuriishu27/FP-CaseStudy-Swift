@@ -123,9 +123,9 @@ precedencegroup KleisliOperatorPrecedence {
 
 infix operator >=>: KleisliOperatorPrecedence
 
-struct ResultModule<T> {
+struct ResultModule {
 
-    static func returnR(_ x: T) -> Result<T, Error> { Result.success(x) }
+    static func returnR<T>(_ x: T) -> Result<T, Error> { Result.success(x) }
 
     //    let ( >>= ) xR f =
     //        Result.bind f xR
@@ -152,8 +152,18 @@ struct ResultModule<T> {
         return f <^> x <*> y
     }
 
+    static func bind<T, U>(m: Result<T, Error>, f: (T) -> Result<U, Error>) -> Result<U, Error> {
+        f -<< m
+    }
+
     /// Computation Expression
+    @_functionBuilder
     struct ResultBuilder {
+
+        static func buildBlock<T>(_ x: Result<T, Error>...) -> Result<T, Error> {
+            Result.success(try! x.first!.get())
+        }
+
 
         func bind<T, U>(m: Result<T, Error>, f: (T) -> Result<U, Error>) -> Result<U, Error> {
             f -<< m
@@ -251,6 +261,12 @@ struct ResultModule<T> {
 
     }
 
-    let result = ResultBuilder()
+//    let result = ResultBuilder()
+
+    static func result<T>(
+        @ResultBuilder child: () -> Result<T, Error>
+    ) -> Result<T, Error> {
+        return child()
+    }
 
 }
