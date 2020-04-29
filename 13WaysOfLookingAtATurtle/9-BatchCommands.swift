@@ -25,7 +25,7 @@ import Foundation
 //    ======================================
 
 // ======================================
-// - MARK: TurtleCommmandHandler
+// MARK: TurtleCommmandHandler
 // ======================================
 
 final class TurtleCommmandHandler {
@@ -34,11 +34,11 @@ final class TurtleCommmandHandler {
     static let log: (String) -> Void = { message in print(message) }
 
     // logged versions
-    let move = FPTurtle.move(log)
-    let turn = FPTurtle.turn(log)
-    let penDown = FPTurtle.penDown(log)
-    let penUp = FPTurtle.penUp(log)
-    let setColor = FPTurtle.setColor(log)
+    static let move = FPTurtle.move(log)
+    static let turn = FPTurtle.turn(log)
+    static let penDown = FPTurtle.penDown(log)
+    static let penUp = FPTurtle.penUp(log)
+    static let setColor = FPTurtle.setColor(log)
 
     enum TurtleCommand {
         case move(_ distance: Distance)
@@ -53,7 +53,7 @@ final class TurtleCommmandHandler {
     // --------------------------------------
 
     /// Apply a command to the turtle state and return the new state
-    func applyCommand(state: TurtleState, command: TurtleCommand) -> TurtleState {
+    static func applyCommand(state: TurtleState, command: TurtleCommand) -> TurtleState {
         switch command {
         case .move(let distance):
             return move(distance)(state)
@@ -69,14 +69,14 @@ final class TurtleCommmandHandler {
     }
 
     /// Run list of commands in one go
-    static let run: ([TurtleCommand]) -> Void = { aListOfCommands in
-//        aListOfCommands.reduce(FPTurtle.initialTurtleState, applyCommand)
+    let run: ([TurtleCommand]) -> Void = { aListOfCommands in
+        _ = aListOfCommands.reduce(FPTurtle.initialTurtleState, applyCommand)
     }
 
 }
 
 // ======================================
-// - MARK: TurtleCommmandClient
+// MARK: TurtleCommmandClient
 // ======================================
 
 struct TurtleCommmandClient {
@@ -94,7 +94,7 @@ struct TurtleCommmandClient {
             .turn(120)
         ]
         // run them
-        TurtleCommmandHandler.run(commands)
+        TurtleCommmandHandler().run(commands)
     }
 
     let drawThreeLines: () -> Void = {
@@ -127,7 +127,7 @@ struct TurtleCommmandClient {
             ]
 
         // run the commands
-        TurtleCommmandHandler.run(commands)
+        TurtleCommmandHandler().run(commands)
     }
 
     let drawPolygon: (Float) -> Void = { n in
@@ -146,7 +146,7 @@ struct TurtleCommmandClient {
         let commands = r.flatMap(drawOneSide)
 
         // run the commands
-        TurtleCommmandHandler.run(commands)
+        TurtleCommmandHandler().run(commands)
     }
 
 }
