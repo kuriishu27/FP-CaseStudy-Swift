@@ -66,24 +66,6 @@ struct TurtleStateComputationClass {
         return innerFn
     }
 
-//    static func bindCurriedT<T, U>(_ f: (T) -> TurtleStateComputation<U>) -> (TurtleStateComputation<T>) -> TurtleStateComputation<U> {
-//
-//        return { (xT) in
-//            let innerFn: (TurtleState) -> (U, TurtleState) = { state in
-//                let (x, state2) = TurtleStateComputationClass.runT(xT, state)
-//                return self.runT(f(x), state2)
-//            }
-//
-//            return innerFn
-//        }
-//
-//    }
-
-//    static func mapT<T, U>(_ f: @escaping (T) -> U) -> TurtleStateComputation<U> {
-//        let x = f >-> returnT
-//
-//    }
-
     static func toComputation<T>(_ f: @escaping (TurtleState) -> (T, TurtleState)) -> TurtleStateComputation<T> {
 
         let innerFn: (TurtleState) -> (T, TurtleState) = { state in
