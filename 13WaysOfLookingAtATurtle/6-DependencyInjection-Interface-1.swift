@@ -28,7 +28,7 @@ import Foundation
 // ============================================================================
 
 // ----------------------------
-// - MARK: Turtle Interface
+// MARK: Turtle Interface
 // ----------------------------
 
 typealias Unit = Void
@@ -44,7 +44,7 @@ protocol ITurtle {
     // "unit" in a function implies side effects
 
 // ----------------------------
-// - MARK: Turtle Api Layer (OO version)
+// MARK: Turtle Api Layer (OO version)
 // ----------------------------
 
 final class TurtleApiLayerOO {
@@ -54,7 +54,7 @@ final class TurtleApiLayerOO {
         print(String(format: "%s", message))
     }
 
-    // - MARK: Turtle Api
+    // MARK: Turtle Api
     public struct TurtleApi {
 
         private let turtle: ITurtle
@@ -155,7 +155,7 @@ final class TurtleApiLayerOO {
 }
 
 // ----------------------------
-// - MARK: Multiple Turtle Implementations (OO version)
+// MARK: Multiple Turtle Implementations (OO version)
 // ----------------------------
 
 extension Turtle: ITurtle {}

@@ -164,8 +164,8 @@ struct ResultModule {
             Result.success(try! x.first!.get())
         }
 
-
-        func bind<T, U>(m: Result<T, Error>, f: (T) -> Result<U, Error>) -> Result<U, Error> {
+        func bind<T, U>(m: Result<T, Error>,
+                        f: (T) -> Result<U, Error>) -> Result<U, Error> {
             f -<< m
         }
 

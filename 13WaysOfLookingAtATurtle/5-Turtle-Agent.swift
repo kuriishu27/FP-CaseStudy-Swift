@@ -58,7 +58,7 @@ final class MailboxProcessor<T> {
 }
 
 // ======================================
-// - MARK: Agent Implementation
+// MARK: Agent Implementation
 // ======================================
 
 final class AgentImplementation {
@@ -72,7 +72,7 @@ final class AgentImplementation {
     }
 
     // --------------------------------------
-    // - MARK: The Agent
+    // MARK: The Agent
     // --------------------------------------
 
     struct TurtleAgent {

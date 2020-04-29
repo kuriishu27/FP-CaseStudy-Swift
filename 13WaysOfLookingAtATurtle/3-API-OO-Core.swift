@@ -25,26 +25,23 @@ import Foundation
 //
 //    ======================================
 
-
 /// Define the exception for API errors
 enum TurtleApiException: Error {
     case exception(_ message: String)
 }
 
 // ======================================
-// - MARK: Turtle Api Layer
+// MARK: Turtle Api Layer
 // ======================================
 
 public final class TurtleApiLayer {
-
-
 
     /// Function to log a message
     static let log: (String) -> Void = { message in
         print(message)
     }
 
-    // - MARK: Turtle Api
+    // MARK: Turtle Api
     public struct TurtleApi {
 
         let turtle = Turtle(log)
@@ -128,7 +125,7 @@ public final class TurtleApiLayer {
 }
 
 // ======================================
-// - MARK: Turtle Api Client
+// MARK: Turtle Api Client
 // ======================================
 
 final class TurtleApiClient {

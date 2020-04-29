@@ -120,7 +120,7 @@ final class TurtleApiPassInSingleFunctions {
 }
 
 // -----------------------------
-// - MARK: Turtle Implementations for "Pass in a single function" design
+// MARK: Turtle Implementations for "Pass in a single function" design
 // -----------------------------
 
 private typealias TurtleApi = TurtleApiPassInSingleFunctions.TurtleApi
@@ -180,7 +180,7 @@ struct ImplementationPassInSingleFunctions {
 }
 
 // -----------------------------
-// - MARK: Turtle API Client for "Pass in a single function" design
+// MARK: Turtle API Client for "Pass in a single function" design
 // -----------------------------
 
 struct TurtleApiClientPassInSingleFunctions {
