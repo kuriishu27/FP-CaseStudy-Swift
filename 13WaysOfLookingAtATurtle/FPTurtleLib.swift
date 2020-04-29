@@ -73,6 +73,54 @@ enum FPTurtle {
 
     }
 
+    static func checkPosition(_ position: Position) -> (MoveResponse, Position) {
+
+        let isOutOfBounds: (Float) -> Bool = { p in p > 100.0 || p < 0.0 }
+
+        let bringInsideBounds: (Float) -> Float = { p in
+            Float.maximum(Float.minimum(p, 100), 0)
+        }
+
+        if isOutOfBounds(position.x) || isOutOfBounds(position.y) {
+
+            let newPos: () -> Position = {
+                   let x = bringInsideBounds(position.x)
+                   let y = bringInsideBounds(position.y)
+                return Position(x: x, y: y)
+            }
+            return (MoveResponse.hitABarrier, newPos())
+
+        } else {
+            return (MoveResponse.moveOk, position)
+        }
+    }
+
+    static func moveR(_ log: @escaping (String) -> Void) -> (Distance) -> (TurtleState) -> (MoveResponse, TurtleState) {
+        // calculate new position
+
+        return { distance in
+            return { state in
+                log("Move \(distance)")
+                let (moveResponse, newPosition) = checkPosition(state.position)
+                // draw line if needed
+                if state.penState == .down {
+                    dummyDrawLine(log, state.position, newPosition, state.color)
+                }
+                // update the state
+
+                let newState = TurtleState(position: newPosition,
+                                           angle: state.angle,
+                                           color: state.color,
+                                           penState: state.penState)
+
+                print(newState)
+
+                return (moveResponse, newState)
+            }
+        }
+
+    }
+
     static func turn(_ log: @escaping (String) -> Void) -> (Angle) -> (TurtleState) -> TurtleState {
         // calculate new angle
         return { angle in
@@ -116,6 +164,23 @@ enum FPTurtle {
                                    angle: state.angle,
                                    color: color,
                                    penState: state.penState)
+            }
+        }
+    }
+
+    static func setColorR(_ log: @escaping (String) -> Void) -> (PenColor) -> (TurtleState) -> (SetColorResponse, TurtleState) {
+        return { color in
+            return { state in
+
+                let colorResult: SetColorResponse = color == .red ? .outOfInk : .colorOk
+                log("SetColor \(color.rawValue)")
+                // return the new state and the SetColor result
+
+                let newState = TurtleState(position: state.position,
+                                           angle: state.angle,
+                                           color: color,
+                                           penState: state.penState)
+                return (colorResult,newState)
             }
         }
     }
