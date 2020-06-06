@@ -1,4 +1,7 @@
 # Thirteen way of looking at a turtle (Swift)
+[![Build Status](https://travis-ci.org/kuriishu27/13-Ways-Of-Looking-FP.svg?branch=master)](https://travis-ci.org/kuriishu27/13-Ways-Of-Looking-FP)
+ [![codecov](https://codecov.io/gh/kuriishu27/13-Ways-Of-Looking-FP/branch/master/graph/badge.svg)](https://codecov.io/gh/kuriishu27/13-Ways-Of-Looking-FP) [![Swift Version](https://img.shields.io/badge/Swift-5.0-F16D39.svg?style=flat)](https://github.com/apple/swift)
+ 
 This is the Swift version of the original article and talk by Scott Wlaschin written in F#.
 
 This repository acts as an exercise to show the numerous benefits of Functional Programming (FP) over OOP with Swift. There are some sections that have yet to be updated.
@@ -319,7 +322,7 @@ final class EventStore<T> {
 - Way 12. Monadic control flow, in which we make decisions in the turtle workflow based on results from earlier commands.
 - TODO Way 13.
 
-These are the functional programming techniquest applied in this project:
+These are the Functional Programming techniques applied in this project:
 
 ## Pure, stateless functions. 
 As seen in all of the FP-oriented examples. All these are very easy to test and mock.
