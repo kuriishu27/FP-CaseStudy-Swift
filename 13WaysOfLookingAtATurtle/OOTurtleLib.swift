@@ -26,7 +26,7 @@ import Foundation
 // inject a logging function
 class Turtle {
 
-    var log: (String) -> Void
+    let log: (String) -> Void
 
     init(_ log: @escaping (String) -> Void) {
         self.log = log

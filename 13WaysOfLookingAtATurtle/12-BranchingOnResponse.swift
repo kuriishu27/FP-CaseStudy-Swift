@@ -88,6 +88,7 @@ final class TurtleComputationClientMonad {
         case .hitABarrier:
 
             print("Oops -- hit a barrier -- turning")
+
             return turtleBuilder.turtle {
                 bind(turn, 90)
             }
@@ -129,7 +130,7 @@ final class TurtleComputationClientMonad {
 
     private func bind<T, U>(_ f: @escaping (T) -> TurtleStateComputation<U>,
                             _ value: T) -> U {
-        return f(value) as! U
+        return f(value)(FPTurtle.initialTurtleState).0
     }
 
     private func bind<T>(_ f: @escaping (T) -> TurtleStateComputation<Unit>,

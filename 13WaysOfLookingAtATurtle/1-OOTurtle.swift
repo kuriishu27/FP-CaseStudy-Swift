@@ -26,7 +26,7 @@ import Foundation
 class OOTurtleClient {
 
     /// Function to log a message
-    var log: (String) -> Void = { message in
+    let log: (String) -> Void = { message in
         print(String(format: "%s", message))
     }
 

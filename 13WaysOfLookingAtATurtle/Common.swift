@@ -143,16 +143,18 @@ struct ResultModule {
     //    let ( <*> ) = applyR
 
     // lift a one-parameter function to result world (same as mapR)
-    static func lift1R<T, U>(f: (T) -> U, x: Result<T, Error>) -> Result<U, Error> { f <^> x }
+    static func lift1R<T, U>(_ f: (T) -> U,
+                             _ x: Result<T, Error>) -> Result<U, Error> { f <^> x }
 
     // lift a two-parameter function to result world
-    static func lift2R<T, U, V> (f: (T) -> (U) -> V,
-                                 x: Result<T, Error>,
-                                 y: Result<U, Error>) -> Result<V, Error> {
+    static func lift2R<T, U, V> (_ f: (T) -> (U) -> V,
+                                 _ x: Result<T, Error>,
+                                 _ y: Result<U, Error>) -> Result<V, Error> {
         return f <^> x <*> y
     }
 
-    static func bind<T, U>(m: Result<T, Error>, f: (T) -> Result<U, Error>) -> Result<U, Error> {
+    static func bind<T, U>(_ m: Result<T, Error>,
+                           _ f: (T) -> Result<U, Error>) -> Result<U, Error> {
         f -<< m
     }
 
@@ -164,26 +166,26 @@ struct ResultModule {
             Result.success(try! x.first!.get())
         }
 
-        func bind<T, U>(m: Result<T, Error>,
-                        f: (T) -> Result<U, Error>) -> Result<U, Error> {
-            f -<< m
+        func bind<T, U>(_ m: Result<T, Error>,
+                        _ f: (T) -> Result<U, Error>) -> Result<U, Error> {
+            m >>- f
         }
 
-        func `return`<T>(x: T) -> Result<T, Error> {
+        func `return`<T>(_ x: T) -> Result<T, Error> {
             Result.success(x)
         }
 
-        func returnFrom<T>(m: Result<T, Error>) -> Result<T, Error> {
+        func returnFrom<T>(_ m: Result<T, Error>) -> Result<T, Error> {
             m
         }
 
         func zero() -> Result<Unit, Error> {
-            self.return(x: ())
+            self.return(())
         }
 
-        func combine<T, U>(m1: Result<T, Error>,
-                           f: (T) -> Result<U, Error>) -> Result<U, Error> {
-            return bind(m: m1, f: f)
+        func combine<T, U>(_ m1: Result<T, Error>,
+                           _ f: (T) -> Result<U, Error>) -> Result<U, Error> {
+            return bind(m1, f)
         }
 
         func delay<T, U>(f: @escaping (T) -> U) -> (T) -> U {
@@ -196,13 +198,13 @@ struct ResultModule {
 
         func tryWith<T>(m: Result<T, Error>,
                         h: () throws -> Result<T, Error>) -> Result<T, Error> {
-            return returnFrom(m: m)
+            return returnFrom(m)
         }
 
         func tryFinally<T>(m: Result<T, Error>,
                            compensation: () -> Void) -> Result<T, Error> {
             compensation()
-            return returnFrom(m: m)
+            return returnFrom(m)
         }
 
         func using<T, U>(res: T,
@@ -227,7 +229,7 @@ struct ResultModule {
                     self.while(cond: cond, m: m)
                 }
 
-                return bind(m: m(()), f: f)
+                return bind(m(()), f)
             }
         }
 

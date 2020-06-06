@@ -121,12 +121,12 @@ final class FPTurtleApiLayer {
             case TurtleCommands.move.rawValue:
 
                 let distanceR = validateDistance(commandValue)
-                return ResultModule.lift2R(f: move, x: distanceR, y: stateR)
+                return ResultModule.lift2R(move, distanceR, stateR)
 
             case TurtleCommands.turn.rawValue:
 
                 let angleR = validateAngle(commandValue)
-                return ResultModule.lift2R(f: turn, x: angleR, y: stateR)
+                return ResultModule.lift2R(turn, angleR, stateR)
 
             case TurtleCommands.penUp.rawValue: return ResultModule.returnR(penUp(state))
             case TurtleCommands.penDown.rawValue: return ResultModule.returnR(penDown(state))
@@ -134,7 +134,7 @@ final class FPTurtleApiLayer {
             case TurtleCommands.setColor.rawValue:
 
                 let colorR = validateColor(commandValue)
-                return ResultModule.lift2R(f: setColor, x: colorR, y: stateR)
+                return ResultModule.lift2R(setColor, colorR, stateR)
 
             default: return Result.failure(ErrorMessage.InvalidCommand("Invalid command"))
 

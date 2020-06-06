@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Runes
 
 //    ======================================
 //    05-TurtleAgent.fsx
@@ -111,15 +112,15 @@ final class AgentImplementation {
                                               _ state: TurtleState) -> TurtleState {
             switch command {
             case .move(let distance):
-                return AgentImplementation.TurtleAgent.move(distance)(state)
+                return state |> AgentImplementation.TurtleAgent.move(distance)
             case .turn(let angle):
-                return AgentImplementation.TurtleAgent.turn(angle)(state)
+                return state |> AgentImplementation.TurtleAgent.turn(angle)
             case .penUp:
-                return AgentImplementation.TurtleAgent.penUp(state)
+                return state |> AgentImplementation.TurtleAgent.penUp
             case .penDown:
-                return AgentImplementation.TurtleAgent.penDown(state)
+                return state |> AgentImplementation.TurtleAgent.penDown
             case .setColor(let color):
-                return AgentImplementation.TurtleAgent.setColor(color)(state)
+                return state |> AgentImplementation.TurtleAgent.setColor(color)
             }
         }
     }
@@ -214,7 +215,6 @@ final class TurtleApiLayerAgent {
 
             default:
                 fatalError()
-
             }
         }
     }
@@ -230,20 +230,14 @@ final class TurtleApiClientAgent {
         let api = TurtleApiLayerAgent()
 
         let res: Result<Unit, Error> = ResultModule.result {
-            bind(api.exec(), "Move 100")
-            bind(api.exec(), "Turn 120")
-            bind(api.exec(), "Move 100")
-            bind(api.exec(), "Turn 120")
-            bind(api.exec(), "Move 100")
-            bind(api.exec(), "Turn 120")
+            "Move 100" |> api.exec()
+            "Turn 120" |> api.exec()
+            "Move 100" |> api.exec()
+            "Turn 120" |> api.exec()
+            "Move 100" |> api.exec()
+            "Turn 120" |> api.exec()
         }
         // back home at (0,0) with angle 0
-
-    }
-
-    private static func bind<T>(_ f: @escaping (T) -> Result<Unit, Error>, _ value: T) -> Result<Unit, Error> {
-
-        return ResultModule.bind(m: ResultModule.returnR(value), f: f)
 
     }
 
