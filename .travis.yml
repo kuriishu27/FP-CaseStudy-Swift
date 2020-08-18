@@ -1,8 +1,9 @@
 language: swift
-osx_image: xcode11.5
+osx_image: xcode11.6
 script:
-  - for ip in $(dig @8.8.8.8 github.com +short); do ssh-keyscan github.com,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts
-  - xcodebuild -resolvePackageDependencies
-  - xcodebuild  -quiet build test -project 13WaysOfLookingAtATurtle.xcodeproj -scheme 13WaysOfLookingAtATurtle -destination 'platform=iOS Simulator,name=iPhone 11,OS=13.5' CODE_SIGNING_REQUIRED=NO
+  - rm ~/.ssh/id_rsa
+  - for ip in $(dig @8.8.8.8 bitbucket.org +short); do ssh-keyscan bitbucket.org,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts || true 
+  - for ip in $(dig @8.8.8.8 github.com +short); do ssh-keyscan github.com,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts || true
+  - xcodebuild  -quiet build test -project 13WaysOfLookingAtATurtle.xcodeproj -scheme 13WaysOfLookingAtATurtle -destination 'platform=iOS Simulator,name=iPhone 11,OS=13.0' CODE_SIGNING_REQUIRED=NO
 after_success:
   - bash <(curl -s https://codecov.io/bash)
