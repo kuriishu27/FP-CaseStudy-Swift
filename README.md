@@ -1,6 +1,5 @@
 # Thirteen ways of looking at a turtle (Swift)
-[![Build Status](https://travis-ci.org/kuriishu27/13-Ways-Of-Looking-FP.svg?branch=master)](https://travis-ci.org/kuriishu27/13-Ways-Of-Looking-FP)
- [![codecov](https://codecov.io/gh/kuriishu27/13-Ways-Of-Looking-FP/branch/master/graph/badge.svg)](https://codecov.io/gh/kuriishu27/13-Ways-Of-Looking-FP) [![Swift Version](https://img.shields.io/badge/Swift-5.0-F16D39.svg?style=flat)](https://github.com/apple/swift)
+[![Swift Version](https://img.shields.io/badge/Swift-5.0-F16D39.svg?style=flat)](https://github.com/apple/swift)
 
 This is the Swift version of the original article and talk by Scott Wlaschin written in F#.
 
